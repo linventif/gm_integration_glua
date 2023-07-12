@@ -6,5 +6,5 @@
     Note: This file is prioritized over the configuration file in data/gmod-integration/config.json until the id is not empty
 */
 
-gmInte.config.id = "CD91Dr490f" // Server ID (normally 10 characters)
-gmInte.config.token = "9QegBMH89QBbpTxX" // Server Token (normally 16 characters)
+gmInte.config.id = "" // Server ID (normally 10 characters)
+gmInte.config.token = "" // Server Token (normally 16 characters)

@@ -7,6 +7,7 @@ end
 
 // Main Functions
 function gmInte.userFinishConnect(ply)
+    gmInte.log("Player " .. ply:Nick() .. " finished connecting", true)
     gmInte.post(
         "",
         { request = "userFinishConnect" },
@@ -21,7 +22,25 @@ function gmInte.userFinishConnect(ply)
     )
 end
 
+// Player change name (darkrp only)
+hook.Add("onPlayerChangedName", "gmInte:PlayerChangeName", function(ply, old, new)
+    print("fefe " .. ply:Nick() .. " fefe name to " .. new)
+    gmInte.log("Player " .. ply:Nick() .. " changed name to " .. new, true)
+    gmInte.post(
+        "",
+        { request = "userChangeName" },
+        {
+            steam = ply:SteamID64(),
+            name = new,
+        },
+        function( body, length, headers, code )
+            //
+        end
+    )
+end)
+
 function gmInte.serverImportGenerate()
+    gmInte.log("Generating Token", true)
     gmInte.post(
         // Endpoint
         "",

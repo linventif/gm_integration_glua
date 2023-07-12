@@ -24,6 +24,7 @@ function gmInte.ulrGenerate(endpoint, parameters)
 end
 
 function gmInte.fetch(endpoint, parameters, onSuccess)
+    gmInte.log("Fetching " .. endpoint, true)
     http.Fetch(
         // URL
         gmInte.ulrGenerate(endpoint, parameters),
@@ -41,7 +42,7 @@ end
 
 function gmInte.post(endpoint, parameters, data, onSuccess)
     local bodyData = util.TableToJSON(data)
-
+    gmInte.log("Posting " .. endpoint, true)
     HTTP({
         url = gmInte.ulrGenerate(endpoint, parameters),
         method = "POST",
@@ -52,8 +53,10 @@ function gmInte.post(endpoint, parameters, data, onSuccess)
         body = bodyData,
         type = "application/json",
         success = function(code, body, headers)
-            if gmInte.isCodeValid(code) then
-                onSuccess(body, length, headers, code)
+            if (gmInte.isCodeValid(code)) then
+                if (onSuccess) then
+                    onSuccess(body, length, headers, code)
+                end
             else
                 gmInte.httpError(body)
             end
