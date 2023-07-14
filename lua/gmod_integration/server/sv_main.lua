@@ -39,7 +39,7 @@ hook.Add("onPlayerChangedName", "gmInte:PlayerChangeName", function(ply, old, ne
     )
 end)
 
-function gmInte.serverImportGenerate()
+function gmInte.serverExport()
     gmInte.log("Generating Token", true)
     gmInte.post(
         // Endpoint
@@ -71,7 +71,7 @@ function gmInte.saveSetting(setting, value)
         return
     end
     gmInte.settings[setting] = value
-    file.Write("gmod_integration/settings.json", util.TableToJSON(gmInte.settings))
+    file.Write("gm_integration/settings.json", util.TableToJSON(gmInte.settings))
     gmInte.log("Setting Saved")
 end
 
@@ -80,15 +80,15 @@ local conFuncs = {
     ["version"] = function()
         gmInte.log("Version: " .. gmInte.version)
     end,
-    ["generate"] = function()
-        gmInte.serverImportGenerate()
+    ["export"] = function()
+        gmInte.serverExport()
     end,
     ["setting"] = function(args)
         gmInte.saveSetting(args[2], args[3])
     end,
 }
 
-concommand.Add("gmod_integration", function(ply, cmd, args)
+concommand.Add("gm_integration", function(ply, cmd, args)
     // only usable by server console and superadmins
     if ply:IsPlayer() && !ply:IsSuperAdmin() then return end
 
