@@ -1,9 +1,6 @@
-// Network
-util.AddNetworkString("gmIntegration")
-
-function gmInte.removePort(ip)
-    return string.Explode(":", ip)[1]
-end
+//
+// Functions
+//
 
 // Meta
 local ply = FindMetaTable("Player")
@@ -18,7 +15,11 @@ function ply:gmInteGetTotalMoney()
     return 0
 end
 
-// Main Functions
+// Main
+function gmInte.removePort(ip)
+    return string.Explode(":", ip)[1]
+end
+
 function gmInte.serverExport()
     gmInte.log("Generating Token", true)
     gmInte.post(
@@ -45,13 +46,13 @@ function gmInte.serverExport()
 end
 
 function gmInte.saveSetting(setting, value)
-    // save this in data/gmod_integration/settings.json but first check if variable is valid
-    if !gmInte.settings[setting] then
+    // save this in data/gmod_integration/setting.json but first check if variable is valid
+    if !gmInte.config[setting] then
         gmInte.log("Unknown Setting")
         return
     end
-    gmInte.settings[setting] = value
-    file.Write("gm_integration/settings.json", util.TableToJSON(gmInte.settings))
+    gmInte.config[setting] = value
+    file.Write("gm_integration/config.json", util.TableToJSON(gmInte.config, true))
     gmInte.log("Setting Saved")
 end
 
@@ -91,70 +92,15 @@ function gmInte.playerDisconnected(ply)
     )
 end
 
+function gmInte.tryConfig()
+    gmInte.simplePost("tryConfig", {},
+    function( body, length, headers, code)
+        gmInte.log("GG you are authorized, the link discord guild is: " .. body)
+    end)
+end
+
 function gmInte.serverShutDown()
     for ply, ply in pairs(player.GetAll()) do
         gmInte.playerDisconnected(ply)
     end
 end
-
-// Net Functions
-local conFuncs = {
-    ["version"] = function()
-        gmInte.log("Version: " .. gmInte.version)
-    end,
-    ["export"] = function()
-        gmInte.serverExport()
-    end,
-    ["setting"] = function(args)
-        gmInte.saveSetting(args[2], args[3])
-    end,
-}
-
-concommand.Add("gm_integration", function(ply, cmd, args)
-    // only usable by server console and superadmins
-    if ply:IsPlayer() && !ply:IsSuperAdmin() then return end
-
-    // check if argument is valid
-    if conFuncs[args[1]] then
-        conFuncs[args[1]](args)
-    else
-        gmInte.log("Unknown Command Argument")
-    end
-end)
-
-local netFuncs = {
-    [0] = function(ply)
-        gmInte.userFinishConnect(ply)
-    end,
-}
-
-net.Receive("gmIntegration", function(len, ply)
-    if !ply:IsPlayer() then return end
-    local id = net.ReadUInt(8)
-    local data = util.JSONToTable(net.ReadString() || "{}")
-    // check if argument is valid
-    if netFuncs[id] then
-        netFuncs[id](ply, data)
-    end
-end)
-
-//
-// Hooks
-//
-
-// Server
-hook.Add("ShutDown", "gmInte:Server:ShutDown", function()
-    gmInte.serverShutDown(ply)
-end)
-
-// Player
-gameevent.Listen("player_connect")
-hook.Add("player_connect", "gmInte:Player:Connect", function(data)
-    gmInte.playerConnect(data)
-end)
-hook.Add("PlayerDisconnected", "gmInte:Player:Disconnect", function(ply)
-    gmInte.playerDisconnected(ply)
-end)
-hook.Add("onPlayerChangedName", "gmInte:PlayerChangeName", function(ply, old, new)
-    gmInte.playerChangeName(ply, old, new)
-end)

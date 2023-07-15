@@ -57,6 +57,9 @@ include("gmod_integration/shared/sh_languages.lua")
 if SERVER then
     include("gmod_integration/server/sv_http.lua")
     include("gmod_integration/server/sv_main.lua")
+    include("gmod_integration/server/sv_net.lua")
+    include("gmod_integration/server/sv_hook.lua")
+    include("gmod_integration/server/sv_con.lua")
 
     // Send all Shared files to the Client
     AddCSLuaFile("gmod_integration/shared/sh_main.lua")

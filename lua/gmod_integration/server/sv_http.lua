@@ -1,7 +1,13 @@
+//
+// HTTP
+//
+
+
 // Variables
 gmInte.api = 'https://gmod-integration.com/api'
 gmInte.defParams = "&id=" .. gmInte.config.id .. "&token=" .. gmInte.config.token .. "&version=" .. gmInte.version
 
+// Functions
 function gmInte.isCodeValid(code)
     if code == 200 then
         return true
@@ -74,6 +80,20 @@ function gmInte.simplePost(request_id, data, onSuccess)
             request = request_id
         },
         data,
+        function( body, length, headers, code )
+            if (onSuccess) then
+                onSuccess(body, length, headers, code)
+            end
+        end
+    )
+end
+
+function gmInte.simpleFetch(request_id, onSuccess)
+    gmInte.fetch(
+        "",
+        {
+            request = request_id
+        },
         function( body, length, headers, code )
             if (onSuccess) then
                 onSuccess(body, length, headers, code)
