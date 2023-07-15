@@ -5,40 +5,20 @@ function gmInte.removePort(ip)
     return string.Explode(":", ip)[1]
 end
 
-// Main Functions
-function gmInte.userFinishConnect(ply)
-    gmInte.log("Player " .. ply:Nick() .. " finished connecting", true)
-    gmInte.post(
-        "",
-        { request = "userFinishConnect" },
-        {
-            steam = ply:SteamID64(), // essential
-            name = ply:Nick(), // for the syncro name
-            ip = gmInte.removePort(ply:IPAddress()), // for the trust system
-        },
-        function( body, length, headers, code )
-            //
-        end
-    )
+// Meta
+local ply = FindMetaTable("Player")
+
+function ply:gmInteGetTotalMoney()
+    // if darkrp
+    if DarkRP then
+        return self:getDarkRPVar("money")
+    end
+
+    // else
+    return 0
 end
 
-// Player change name (darkrp only)
-hook.Add("onPlayerChangedName", "gmInte:PlayerChangeName", function(ply, old, new)
-    print("fefe " .. ply:Nick() .. " fefe name to " .. new)
-    gmInte.log("Player " .. ply:Nick() .. " changed name to " .. new, true)
-    gmInte.post(
-        "",
-        { request = "userChangeName" },
-        {
-            steam = ply:SteamID64(),
-            name = new,
-        },
-        function( body, length, headers, code )
-            //
-        end
-    )
-end)
-
+// Main Functions
 function gmInte.serverExport()
     gmInte.log("Generating Token", true)
     gmInte.post(
@@ -73,6 +53,48 @@ function gmInte.saveSetting(setting, value)
     gmInte.settings[setting] = value
     file.Write("gm_integration/settings.json", util.TableToJSON(gmInte.settings))
     gmInte.log("Setting Saved")
+end
+
+function gmInte.playerConnect(data)
+    if (data.bot == 1) then return end
+    data.steam = util.SteamIDTo64(data.networkid)
+    gmInte.simplePost("userConnect", data)
+end
+
+function gmInte.userFinishConnect(ply)
+    gmInte.simplePost("userFinishConnect",
+        {
+            steam = ply:SteamID64(), // essential
+            name = ply:Nick(), // for the syncro name
+        }
+    )
+end
+
+function gmInte.playerChangeName(ply, old, new)
+    gmInte.simplePost("userChangeName",
+        {
+            steam = ply:SteamID64(),
+            old = old,
+            new = new,
+        }
+    )
+end
+
+function gmInte.playerDisconnected(ply)
+    gmInte.simplePost("userDisconnect",
+        {
+            steam = ply:SteamID64(),
+            kills = ply:Frags(),
+            deaths = ply:Deaths(),
+            money = ply:gmInteGetTotalMoney(),
+        }
+    )
+end
+
+function gmInte.serverShutDown()
+    for ply, ply in pairs(player.GetAll()) do
+        gmInte.playerDisconnected(ply)
+    end
 end
 
 // Net Functions
@@ -114,4 +136,25 @@ net.Receive("gmIntegration", function(len, ply)
     if netFuncs[id] then
         netFuncs[id](ply, data)
     end
+end)
+
+//
+// Hooks
+//
+
+// Server
+hook.Add("ShutDown", "gmInte:Server:ShutDown", function()
+    gmInte.serverShutDown(ply)
+end)
+
+// Player
+gameevent.Listen("player_connect")
+hook.Add("player_connect", "gmInte:Player:Connect", function(data)
+    gmInte.playerConnect(data)
+end)
+hook.Add("PlayerDisconnected", "gmInte:Player:Disconnect", function(ply)
+    gmInte.playerDisconnected(ply)
+end)
+hook.Add("onPlayerChangedName", "gmInte:PlayerChangeName", function(ply, old, new)
+    gmInte.playerChangeName(ply, old, new)
 end)

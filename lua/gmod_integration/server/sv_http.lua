@@ -43,26 +43,43 @@ end
 function gmInte.post(endpoint, parameters, data, onSuccess)
     local bodyData = util.TableToJSON(data)
     gmInte.log("Posting " .. endpoint, true)
-    HTTP({
-        url = gmInte.ulrGenerate(endpoint, parameters),
-        method = "POST",
-        headers = {
-            ["Content-Type"] = "application/json",
-            ["Content-Length"] = tostring(#bodyData),
-        },
-        body = bodyData,
-        type = "application/json",
-        success = function(code, body, headers)
-            if (gmInte.isCodeValid(code)) then
-                if (onSuccess) then
-                    onSuccess(body, length, headers, code)
+    HTTP(
+        {
+            url = gmInte.ulrGenerate(endpoint, parameters),
+            method = "POST",
+            headers = {
+                ["Content-Type"] = "application/json",
+                ["Content-Length"] = tostring(#bodyData),
+            },
+            body = bodyData,
+            type = "application/json",
+            success = function(code, body, headers)
+                if (gmInte.isCodeValid(code)) then
+                    if (onSuccess) then
+                        onSuccess(body, length, headers, code)
+                    end
+                else
+                    gmInte.httpError(body)
                 end
-            else
-                gmInte.httpError(body)
+            end,
+            failed = gmInte.httpError,
+        }
+    )
+end
+
+function gmInte.simplePost(request_id, data, onSuccess)
+    gmInte.post(
+        "",
+        {
+            request = request_id
+        },
+        data,
+        function( body, length, headers, code )
+            if (onSuccess) then
+                onSuccess(body, length, headers, code)
             end
-        end,
-        failed = gmInte.httpError,
-        })
+        end
+    )
 end
 
 /*
