@@ -55,6 +55,7 @@ include("gmod_integration/shared/sh_main.lua")
 include("gmod_integration/shared/sh_languages.lua")
 
 if SERVER then
+    // Include all Server files
     include("gmod_integration/server/sv_http.lua")
     include("gmod_integration/server/sv_main.lua")
     include("gmod_integration/server/sv_net.lua")
