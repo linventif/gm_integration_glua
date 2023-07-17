@@ -88,6 +88,7 @@ function gmInte.playerDisconnected(ply)
             kills = ply:Frags(),
             deaths = ply:Deaths(),
             money = ply:gmInteGetTotalMoney(),
+            rank = ply:GetUserGroup(),
         }
     )
 end
