@@ -20,6 +20,10 @@ function gmInte.removePort(ip)
     return string.Explode(":", ip)[1]
 end
 
+function gmInte.plyValid(ply)
+    return ply:IsValid() && ply:IsPlayer() && !ply:IsBot()
+end
+
 function gmInte.serverExport()
     gmInte.log("Generating Token", true)
     gmInte.post(
@@ -63,6 +67,7 @@ function gmInte.playerConnect(data)
 end
 
 function gmInte.userFinishConnect(ply)
+    if (!gmInte.plyValid(ply)) then return end
     gmInte.simplePost("userFinishConnect",
         {
             steam = ply:SteamID64(), // essential
@@ -72,6 +77,7 @@ function gmInte.userFinishConnect(ply)
 end
 
 function gmInte.playerChangeName(ply, old, new)
+    if (!gmInte.plyValid(ply)) then return end
     gmInte.simplePost("userChangeName",
         {
             steam = ply:SteamID64(),
@@ -82,13 +88,14 @@ function gmInte.playerChangeName(ply, old, new)
 end
 
 function gmInte.playerDisconnected(ply)
+    if (!gmInte.plyValid(ply)) then return end
     gmInte.simplePost("userDisconnect",
         {
             steam = ply:SteamID64(),
-            kills = ply:Frags(),
-            deaths = ply:Deaths(),
+            kills = ply:Frags() || 0,
+            deaths = ply:Deaths() || 0,
             money = ply:gmInteGetTotalMoney(),
-            rank = ply:GetUserGroup(),
+            rank = ply:GetUserGroup() || "user",
         }
     )
 end
