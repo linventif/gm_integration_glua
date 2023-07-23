@@ -4,7 +4,7 @@
 
 
 // Variables
-gmInte.api = 'https://gmod-integration.com/api'
+gmInte.api = 'https://api.gmod-integration.com/'
 gmInte.defParams = "&id=" .. gmInte.config.id .. "&token=" .. gmInte.config.token .. "&version=" .. gmInte.version
 
 // Functions
