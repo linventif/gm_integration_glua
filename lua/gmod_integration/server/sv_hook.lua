@@ -8,7 +8,9 @@ hook.Add("ShutDown", "gmInte:Server:ShutDown", function()
 end)
 // set convar sv_hibernate_think to 1
 hook.Add("Initialize", "gmInte.sendStatus", function()
-    gmInte.sendStatus()
+    timer.Simple(1, function()
+        gmInte.sendStatus()
+    end)
 end)
 
 // Player
