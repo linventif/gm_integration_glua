@@ -6,6 +6,10 @@
 hook.Add("ShutDown", "gmInte:Server:ShutDown", function()
     gmInte.serverShutDown(ply)
 end)
+// set convar sv_hibernate_think to 1
+hook.Add("Initialize", "gmInte.sendStatus", function()
+    gmInte.sendStatus()
+end)
 
 // Player
 gameevent.Listen("player_connect")

@@ -76,6 +76,25 @@ function gmInte.userFinishConnect(ply)
     )
 end
 
+function gmInte.sendStatus()
+    gmInte.simplePost("serverStatus",
+        {
+            hostname = GetHostName(),
+            ip = game.GetIPAddress(),
+            port = GetConVar("hostport"):GetInt(),
+            map = game.GetMap(),
+            players = #player.GetAll(),
+            maxplayers = game.MaxPlayers(),
+            gamemode = engine.ActiveGamemode(),
+        }
+    )
+end
+
+// every 5 minutes
+timer.Create("gmInte.sendStatus", 300, 0, function()
+    gmInte.sendStatus()
+end)
+
 function gmInte.playerChangeName(ply, old, new)
     if (!gmInte.plyValid(ply)) then return end
     gmInte.simplePost("userChangeName",

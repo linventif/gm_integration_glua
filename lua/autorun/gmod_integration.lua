@@ -55,6 +55,9 @@ include("gmod_integration/shared/sh_main.lua")
 include("gmod_integration/shared/sh_languages.lua")
 
 if SERVER then
+    // Disable hibernate think
+	RunConsoleCommand("sv_hibernate_think", "1")
+
     // Include all Server files
     include("gmod_integration/server/sv_http.lua")
     include("gmod_integration/server/sv_main.lua")
