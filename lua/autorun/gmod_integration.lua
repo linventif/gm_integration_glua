@@ -1,3 +1,6 @@
+// If is singleplayer, don't load
+if game.SinglePlayer() then return end
+
 //
 // Prevent the user from using a static version of the addon
 //
